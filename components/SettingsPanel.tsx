@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSettings, useAudioContext } from '../App';
 import { CloseIcon } from '../assets/icons';
 
@@ -17,7 +17,16 @@ const wallpapers = [
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, setIsOpen }) => {
   const { settings, updateSettings } = useSettings();
-  const { playClickSound } = useAudioContext();
+  const { playClickSound, playSlideSound } = useAudioContext();
+  const prevIsOpenRef = useRef(isOpen);
+
+  useEffect(() => {
+    // Play sound only when opening the panel
+    if (isOpen && !prevIsOpenRef.current) {
+      playSlideSound();
+    }
+    prevIsOpenRef.current = isOpen;
+  }, [isOpen, playSlideSound]);
 
   const handleClose = () => {
     playClickSound();

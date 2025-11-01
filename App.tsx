@@ -28,6 +28,7 @@ interface AudioContextType {
   playClickSound: () => void;
   playUnlockSound: () => void;
   playCompleteSound: () => void;
+  playSlideSound: () => void;
 }
 const AudioContext = createContext<AudioContextType | null>(null);
 
@@ -44,15 +45,17 @@ const App: React.FC = () => {
   const [view, setView] = useState<'home' | 'focus'>('home');
   const [newlyUnlockedBadge, setNewlyUnlockedBadge] = useState<Badge | null>(null);
 
-  const { play: playClick } = useAudio('/sounds/click.mp3');
-  const { play: playUnlock } = useAudio('/sounds/unlock.mp3');
-  const { play: playComplete } = useAudio('/sounds/complete.mp3');
+  const { play: playClick } = useAudio('click');
+  const { play: playUnlock } = useAudio('unlock');
+  const { play: playComplete } = useAudio('complete');
+  const { play: playSlide } = useAudio('slide');
 
   const audioContextValue = useMemo(() => ({
     playClickSound: () => settings.soundEnabled && playClick(),
     playUnlockSound: () => settings.soundEnabled && playUnlock(),
     playCompleteSound: () => settings.soundEnabled && playComplete(),
-  }), [settings.soundEnabled, playClick, playUnlock, playComplete]);
+    playSlideSound: () => settings.soundEnabled && playSlide(),
+  }), [settings.soundEnabled, playClick, playUnlock, playComplete, playSlide]);
 
   const updateSettings = useCallback((newSettings: Partial<Settings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));

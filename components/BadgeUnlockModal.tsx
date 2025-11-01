@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Badge } from '../types';
+import { useAudioContext } from '../App';
 
 interface BadgeUnlockModalProps {
   badge: Badge;
@@ -9,6 +10,7 @@ interface BadgeUnlockModalProps {
 
 const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({ badge, onClose }) => {
   const [visible, setVisible] = useState(false);
+  const { playClickSound } = useAudioContext();
 
   useEffect(() => {
     // Trigger animation after mount
@@ -17,6 +19,7 @@ const BadgeUnlockModal: React.FC<BadgeUnlockModalProps> = ({ badge, onClose }) =
   }, []);
 
   const handleClose = () => {
+    playClickSound();
     setVisible(false);
     setTimeout(onClose, 300); // Allow animation to finish
   };

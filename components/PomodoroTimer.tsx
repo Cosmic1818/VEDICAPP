@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useProgress, useSettings, useAudioContext } from '../App';
 import { PlayIcon, PauseIcon, ResetIcon } from '../assets/icons';
@@ -13,6 +12,7 @@ const PomodoroTimer: React.FC = () => {
   const [mode, setMode] = useState<TimerMode>('work');
   const [isActive, setIsActive] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
+  const [isCompleting, setIsCompleting] = useState(false); // State for celebration animation
 
   const getInitialTime = useCallback(() => {
     switch (mode) {
@@ -30,10 +30,19 @@ const PomodoroTimer: React.FC = () => {
     setIsActive(false);
   }, [settings.timerLength, settings.shortBreak, settings.longBreak, getInitialTime]);
 
+  // Effect to turn off the celebration animation after it plays
+  useEffect(() => {
+    if (isCompleting) {
+      const timerId = setTimeout(() => setIsCompleting(false), 1200);
+      return () => clearTimeout(timerId);
+    }
+  }, [isCompleting]);
+
   const nextMode = useCallback(() => {
     playCompleteSound();
     if (mode === 'work') {
       addCompletedSession();
+      setIsCompleting(true); // Trigger celebration
       const newSessionCount = sessionCount + 1;
       setSessionCount(newSessionCount);
       setMode(newSessionCount % 4 === 0 ? 'longBreak' : 'shortBreak');
@@ -101,7 +110,7 @@ const PomodoroTimer: React.FC = () => {
   };
 
   return (
-    <div className="p-6 md:p-8 bg-white/30 dark:bg-black/30 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-black/20 text-center relative overflow-hidden">
+    <div className={`p-6 md:p-8 bg-white/30 dark:bg-black/30 backdrop-blur-xl rounded-3xl shadow-2xl text-center relative overflow-hidden border-2 transform transition-all duration-700 ease-in-out ${isCompleting ? 'border-emerald-400 dark:border-emerald-500 shadow-emerald-500/40 dark:shadow-emerald-400/40 scale-[1.03]' : 'border-white/20 dark:border-black/20'}`}>
         <div 
           className="absolute top-0 left-0 bottom-0 bg-orange-300/50 dark:bg-orange-600/50 transition-all duration-500 ease-linear"
           style={{ width: `${progressPercentage}%` }}
